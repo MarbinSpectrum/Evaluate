@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 public class Evaluate
 {
-    private static Token Lexer(int idx,string str)
+    private static Token Lexer(int pIdx, string pStr)
     {
-        Number number = Number.GetNum(idx, str);
+        Number number = Number.GetNum(pIdx, pStr);
         if (number != null)
         {
             return number;
         }
 
-        MathSign mathSign = MathSign.GetMathSign(idx, str);
+        MathSign mathSign = MathSign.GetMathSign(pIdx, pStr);
         if (mathSign != null)
         {
             return mathSign;
         }
 
-        Bracket bracket = Bracket.GetBracket(idx, str);
+        Bracket bracket = Bracket.GetBracket(pIdx, pStr);
         if (bracket != null)
         {
             return bracket;
@@ -28,18 +28,18 @@ public class Evaluate
         return null;
     }
 
-    private static List<Token> Tokenizer(string str)
+    private static List<Token> Tokenizer(string pStr)
     {
         List<Token> tokens = new List<Token>();
         int idx = 0;
-        while (idx < str.Length)
+        while (idx < pStr.Length)
         {
-            Token token = Lexer(idx, str);
+            Token token = Lexer(idx, pStr);
             if (token != null)
             {
                 //토큰을 넣어준다.
                 tokens.Add(token);
-                idx += token.Length;
+                idx += token.GetLength();
                 continue;
             }           
             idx++;
@@ -50,13 +50,14 @@ public class Evaluate
 
         for (int i = 0; i < tokens.Count; i++)
         {
-            //부호 사이에 임시 숫자를 넣어준다.
+            //특정타입의 토큰이 연속해서 나오는것은 바람직한 모양이아니다.
+            //토큰사이에 다른 타입의 토큰을 섞어준다.
             if (tokens[i].type == Type.MathSign)
             {
-                //해당 토큰이 부호일때
+                //해당 토큰이 수식일때
                 if (frontToken != null && frontToken.type == Type.MathSign)
                 {
-                    //앞의 토큰도 부호이면
+                    //앞의 토큰도 수식이면
                     MathSign msData = (MathSign)tokens[i];
                     MathSign frontMsData = (MathSign)frontToken;
 
